@@ -13,6 +13,7 @@ function App() {
 
   const handleSendMessage = () => {
     socket.emit("send_message", { message, room });
+    setIsTurn(!isTurn);
   };
 
   // only join the room once, on mount
@@ -27,6 +28,7 @@ function App() {
   useEffect(() => {
     socket.on("receive_message", (data) => {
       setMessageReceived(data);
+      setIsTurn(!isTurn);
     });
 
     socket.on("joined_room", (room) => {
