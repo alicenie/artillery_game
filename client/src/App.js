@@ -19,6 +19,7 @@ function App() {
   const [showProjectile, setShowProjectile] = useState(false);
   const [wind, setWind] = useState("");
   const [dist, setDist] = useState("");
+  const [isWinner, setIsWinner] = useState(null);
   const [messageReceived, setMessageReceived] = useState("");
 
   const handleSendMessage = () => {
@@ -36,7 +37,6 @@ function App() {
     tempCannonAngles[side] = angle;
     setCannonAngles(tempCannonAngles);
     socket.emit("rotate_cannon", { angle, room, side });
-    console.log(tempCannonAngles);
   };
 
   const handleFire = () => {
@@ -44,32 +44,36 @@ function App() {
     setProjectileSide(side);
     setProjectileSpeed(speed);
     setShowProjectile(true);
-    // check win --> server
 
     // send to server
     socket.emit("fire", { speed, angle, room, side });
   };
 
-  const endProjectile = (dist) => {
+  const endProjectile = (dist, projSide) => {
     setShowProjectile(false);
     setIsTurn(!isTurn);
     if (dist) {
       // check win
       if (Math.abs(dist) <= 3) {
-        console.log("end game");
+        endGame(projSide == side);
       }
-      console.log("distance", dist);
+      // display distance to the opposing cannon
       setDist(Math.floor(Math.abs(dist)));
     }
   };
 
+  const endGame = (win) => {
+    setIsWinner(win);
+    socket.emit("end_game", room);
+  };
+
   // only called once, on mount
-  useEffect(() => {
-    socket.on("connect", () => {
-      console.log("client connect to socket");
-      // socket.emit("join_room");
-    });
-  }, []);
+  // useEffect(() => {
+  //   socket.on("connect", () => {
+  //     console.log("client connect to socket");
+  //     // socket.emit("join_room");
+  //   });
+  // }, []);
 
   useEffect(() => {
     socket.on("receive_message", (data) => {
@@ -107,6 +111,7 @@ function App() {
 
   return (
     <div className="App">
+      {isWinner !== null && (isWinner ? "You win!" : "You lose!")}
       <Typography variant="h5" gutterBottom align="center">
         Artillery Game
       </Typography>

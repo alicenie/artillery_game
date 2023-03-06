@@ -78,6 +78,10 @@ io.on("connection", (socket) => {
       side: data.side,
     });
   });
+
+  socket.on("end_game", (room) => {
+    socket.leave(room);
+  });
 });
 
 server.listen(8080, () => {

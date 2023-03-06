@@ -108,7 +108,7 @@ const Projectile = ({
         if (y > canvas_height) {
           dist = side === "left" ? right_cannon - x : x - left_cannon;
         }
-        animationFinished(dist);
+        animationFinished(dist, side);
       } else {
         frameId = requestAnimationFrame(draw);
       }
@@ -122,9 +122,9 @@ const Projectile = ({
     };
   };
 
-  const animationFinished = (dist) => {
+  const animationFinished = (dist, side) => {
     console.log("Animation finished");
-    endProjectile(dist);
+    endProjectile(dist, side);
   };
 
   const drawCannon = ({ leftAngle, rightAngle }) => {
