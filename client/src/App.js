@@ -55,7 +55,7 @@ function App() {
     setIsTurn(!isTurn);
     if (dist) {
       // check win
-      if (Math.abs(dist) <= 300) {
+      if (Math.abs(dist) <= 3) {
         endGame(projSide == side);
       } else if (dist == 500) {
         // hit itself

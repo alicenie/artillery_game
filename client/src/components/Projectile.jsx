@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 const ratio = 0.5;
 const canvas_width = 2000 * ratio;
 const canvas_height = 1000 * ratio;
+const buffer = 10;
 const left_cannon = 500 * ratio;
 const right_cannon = 1500 * ratio;
 
@@ -93,7 +94,7 @@ const Projectile = ({
       //     0.5 * gravity * Math.pow(time, 2);
 
       // draw ball at new position
-      ctx.clearRect(0, 0, canvas_width, canvas_height);
+      ctx.clearRect(0, 0, canvas_width, canvas_height + buffer);
       ctx.beginPath();
       ctx.arc(x, y, 5, 0, 2 * Math.PI);
       ctx.fillStyle = "red";
@@ -132,25 +133,25 @@ const Projectile = ({
     const canvas = bgCanvasRef.current;
     const ctx = canvas.getContext("2d");
     // clear canvas
-    ctx.clearRect(0, 0, canvas_width, canvas_height);
+    ctx.clearRect(0, 0, canvas_width, canvas_height + buffer);
 
     // set the border color and thickness
     ctx.strokeStyle = "black";
     ctx.lineWidth = 5;
 
     // draw the border
-    ctx.strokeRect(0, 0, canvas_width, canvas_height);
+    ctx.strokeRect(0, 0, canvas_width, canvas_height + buffer);
 
     // draw left cannon
     ctx.save();
-    ctx.translate(left_cannon, canvas_height);
+    ctx.translate(left_cannon, canvas_height + buffer);
     // if (props.side === "left")
     ctx.rotate(((90 - leftAngle) * Math.PI) / 180);
     ctx.fillStyle = "#555";
-    ctx.fillRect(-25, -25, 50, 50);
+    ctx.fillRect(-10, -10, 20, 20);
     ctx.beginPath();
     ctx.moveTo(0, 0);
-    ctx.lineTo(0, -75);
+    ctx.lineTo(0, -40);
     ctx.lineWidth = 10;
     ctx.strokeStyle = "#555";
     ctx.stroke();
@@ -158,14 +159,14 @@ const Projectile = ({
 
     // draw right cannon
     ctx.save();
-    ctx.translate(right_cannon, canvas_height);
+    ctx.translate(right_cannon, canvas_height + buffer);
     // if (props.side === "right")
     ctx.rotate((-(90 - rightAngle) * Math.PI) / 180);
     ctx.fillStyle = "#555";
-    ctx.fillRect(-25, -25, 50, 50);
+    ctx.fillRect(-10, -10, 20, 20);
     ctx.beginPath();
     ctx.moveTo(0, 0);
-    ctx.lineTo(0, -75);
+    ctx.lineTo(0, -40);
     ctx.lineWidth = 10;
     ctx.strokeStyle = "#555";
     ctx.stroke();
@@ -177,13 +178,13 @@ const Projectile = ({
       <canvas
         ref={bgCanvasRef}
         width={canvas_width}
-        height={canvas_height}
+        height={canvas_height + buffer}
         style={{ position: "absolute", top: "30%", left: "15%" }}
       />
       <canvas
         ref={anCanvasRef}
         width={canvas_width}
-        height={canvas_height}
+        height={canvas_height + buffer}
         style={{ position: "absolute", top: "30%", left: "15%" }}
       />
     </div>

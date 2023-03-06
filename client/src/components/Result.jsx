@@ -1,4 +1,3 @@
-import "./style.css";
 import React from "react";
 import { Box, Card, Typography } from "@mui/material";
 
