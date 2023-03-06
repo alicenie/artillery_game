@@ -129,6 +129,7 @@ function App() {
         leftAngle={cannonAngles.left}
         rightAngle={cannonAngles.right}
         side={projectileSide}
+        wind={wind}
         showProjectile={showProjectile}
         endProjectile={endProjectile}
       />

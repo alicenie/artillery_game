@@ -7,11 +7,29 @@ const canvas_height = 1000 * ratio;
 const left_cannon = 500 * ratio;
 const right_cannon = 1500 * ratio;
 
+// environment and projectile constants
+const gravity = 10; // gravity in m/s^2
+const rho_air = 1; // density of air in kg/m^3
+const mu_air = 1.8e-5; // dynamic viscosity of air in Pa*s
+const d = 0.1; // diameter of projectile in meters
+const m = 1; // weight of projectile in kg
+// Calculate cross-sectional area of projectile
+const A = Math.PI * Math.pow(d / 2, 2);
+
+// calculate air resistance
+const airResistance = (v) => {
+  const Re = (rho_air * v * d) / mu_air;
+  const Cd = 0.47; // coefficient of drag for a sphere
+  const F_drag = 0.5 * rho_air * Math.pow(v, 2) * A * Cd;
+  return F_drag;
+};
+
 const Projectile = ({
   leftAngle,
   rightAngle,
   speed,
   side,
+  wind,
   showProjectile,
   endProjectile,
 }) => {
@@ -38,24 +56,43 @@ const Projectile = ({
   const fire = () => {
     const canvas = anCanvasRef.current;
     const ctx = canvas.getContext("2d");
+    const v0 = speed * ratio; // pixels per second
+    const radians =
+      ((side === "left" ? leftAngle : rightAngle) * Math.PI) / 180;
+    const vx0 =
+      side === "left" ? v0 * Math.cos(radians) : -v0 * Math.cos(radians); // initial projectile speed on x
+    const vy0 = v0 * Math.sin(radians); // initial projectile speed on y
+    const dt = 0.1; // time step in seconds
     let frameId;
     let time = 0;
+    let vx = vx0;
+    let vy = vy0;
+    let x = side === "left" ? left_cannon : right_cannon; // initial x position in meters
+    let y = canvas_height; // initial y position in meters
 
     function draw() {
-      // calculate new position based on time and velocity
-      const velocity = speed * ratio; // pixels per second
-      const gravity = 10 * ratio; // m/s^2
-      const radians =
-        ((side === "left" ? leftAngle : rightAngle) * Math.PI) / 180;
-      let x;
-      if (side === "left")
-        x = velocity * Math.cos(radians) * time + left_cannon;
-      else x = right_cannon - velocity * Math.cos(radians) * time;
-      const y =
-        canvas_height -
-        velocity * Math.sin(radians) * time +
-        0.5 * gravity * Math.pow(time, 2);
-      console.log(y);
+      // calculate the force on projectile
+      const v = Math.sqrt(Math.pow(vx - wind, 2) + Math.pow(vy, 2));
+      const F_drag = airResistance(v);
+      const F_net_x = (-F_drag * (vx - wind)) / v;
+      const F_net_y = -m * gravity - (F_drag * vy) / v;
+      // Calculate acceleration of projectile
+      const ax = F_net_x / m;
+      const ay = F_net_y / m;
+
+      // Update position and velocity of sphere
+      x += vx * dt;
+      y += -vy * dt;
+      vx += ax * dt;
+      vy += ay * dt;
+
+      //   let x;
+      //   if (side === "left") x = v0 * Math.cos(radians) * time + left_cannon;
+      //   else x = right_cannon - v0 * Math.cos(radians) * time;
+      //   const y =
+      //     canvas_height -
+      //     v0 * Math.sin(radians) * time +
+      //     0.5 * gravity * Math.pow(time, 2);
 
       // draw ball at new position
       ctx.clearRect(0, 0, canvas_width, canvas_height);
@@ -66,7 +103,7 @@ const Projectile = ({
 
       // update time and check if animation is finished
       time += 0.1;
-      if (y < 0 || y > canvas_height) {
+      if (y < 0 || y > canvas_height || x > canvas_width || x < 0) {
         cancelAnimationFrame(frameId);
         animationFinished();
       } else {
@@ -84,13 +121,6 @@ const Projectile = ({
 
   const animationFinished = () => {
     console.log("Animation finished");
-    // call your other method here
-    myOtherMethod();
-  };
-
-  const myOtherMethod = () => {
-    console.log("My other method");
-    // do something else here
     endProjectile();
   };
 
