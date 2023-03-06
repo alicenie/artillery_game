@@ -22,7 +22,7 @@ const Input = (props) => {
           margin="normal"
           placeholder="Input speed..."
           fullWidth
-          defaultValue={10}
+          defaultValue={100}
           InputProps={{
             endAdornment: <InputAdornment position="end">m/s</InputAdornment>,
           }}
