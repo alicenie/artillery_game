@@ -56,9 +56,12 @@ function App() {
       // check win
       if (Math.abs(dist) <= 3) {
         endGame(projSide == side);
+      } else if (dist == 500) {
+        // hit itself
+        endGame(false);
       }
       // display distance to the opposing cannon
-      setDist(Math.floor(Math.abs(dist)));
+      setDist(Math.abs(dist).toFixed(1));
     }
   };
 
