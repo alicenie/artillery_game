@@ -31,7 +31,7 @@ const Projectile = ({
     if (showProjectile) {
       fire();
       console.log(side);
-      endProjectile();
+      //   endProjectile();
     }
   }, [showProjectile]);
 
@@ -52,12 +52,13 @@ const Projectile = ({
         x = velocity * Math.cos(radians) * time + left_cannon;
       else x = right_cannon - velocity * Math.cos(radians) * time;
       const y =
-        canvas.height -
+        canvas_height -
         velocity * Math.sin(radians) * time +
         0.5 * gravity * Math.pow(time, 2);
+      console.log(y);
 
       // draw ball at new position
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas_width, canvas_height);
       ctx.beginPath();
       ctx.arc(x, y, 5, 0, 2 * Math.PI);
       ctx.fillStyle = "red";
@@ -65,7 +66,7 @@ const Projectile = ({
 
       // update time and check if animation is finished
       time += 0.1;
-      if (y <= 0) {
+      if (y < 0 || y > canvas_height) {
         cancelAnimationFrame(frameId);
         animationFinished();
       } else {
@@ -90,6 +91,7 @@ const Projectile = ({
   const myOtherMethod = () => {
     console.log("My other method");
     // do something else here
+    endProjectile();
   };
 
   const drawCannon = ({ leftAngle, rightAngle }) => {
@@ -138,13 +140,18 @@ const Projectile = ({
   };
 
   return (
-    <div>
-      <canvas ref={bgCanvasRef} width={canvas_width} height={canvas_height} />
+    <div style={{ margin: "0 auto" }}>
+      <canvas
+        ref={bgCanvasRef}
+        width={canvas_width}
+        height={canvas_height}
+        style={{ position: "absolute", top: "30%", left: "15%" }}
+      />
       <canvas
         ref={anCanvasRef}
         width={canvas_width}
         height={canvas_height}
-        style={{ position: "absolute", top: 0, left: 0 }}
+        style={{ position: "absolute", top: "30%", left: "15%" }}
       />
     </div>
   );

@@ -3,7 +3,7 @@ import io from "socket.io-client";
 import { useEffect, useState } from "react";
 import Projectile from "./components/Projectile";
 import Input from "./components/Input";
-import { Button } from "@mui/material";
+import { Button, Grid, Typography } from "@mui/material";
 
 const socket = io.connect("http://localhost:8080");
 
@@ -17,6 +17,7 @@ function App() {
   const [projectileSide, setProjectileSide] = useState("");
   const [projectileSpeed, setProjectileSpeed] = useState(100);
   const [showProjectile, setShowProjectile] = useState(false);
+  const [wind, setWind] = useState(0);
   const [messageReceived, setMessageReceived] = useState("");
 
   const handleSendMessage = () => {
@@ -46,11 +47,13 @@ function App() {
 
     // send to server
     socket.emit("fire", { speed, angle, room, side });
-    setIsTurn(!isTurn);
+    // setIsTurn(!isTurn);
   };
 
   const endProjectile = () => {
+    console.log("endProjectile", isTurn);
     setShowProjectile(false);
+    setIsTurn(!isTurn);
   };
 
   // only called once, on mount
@@ -83,7 +86,7 @@ function App() {
       setProjectileSpeed(data.speed);
       setProjectileSide(data.side);
       setShowProjectile(true);
-      setIsTurn(!isTurn);
+      // setIsTurn(!isTurn);
     });
 
     socket.on("update_cannon", (data) => {
@@ -97,14 +100,23 @@ function App() {
 
   return (
     <div className="App">
-      <Projectile
-        speed={projectileSpeed}
-        leftAngle={cannonAngles.left}
-        rightAngle={cannonAngles.right}
-        side={projectileSide}
-        showProjectile={showProjectile}
-        endProjectile={endProjectile}
-      />
+      <Typography variant="h5" gutterBottom align="center">
+        Artillery Game
+      </Typography>
+      <Grid container spacing={8} justifyContent="center">
+        <Grid item>
+          <Typography variant="h6">Wind: {wind} m/s</Typography>
+        </Grid>
+        <Grid item>
+          <Typography variant="h6">
+            {side == ""
+              ? "Wait for your opponent to join..."
+              : isTurn
+              ? "It's your turn!"
+              : "It's your opposite's turn!"}
+          </Typography>
+        </Grid>
+      </Grid>
       <Input
         onSpeedChange={handleSpeedChange}
         onAngleChange={handleAngleChange}
@@ -114,6 +126,16 @@ function App() {
       <Button onClick={handleFire} disabled={!isTurn}>
         Fire
       </Button>
+      <Projectile
+        speed={projectileSpeed}
+        leftAngle={cannonAngles.left}
+        rightAngle={cannonAngles.right}
+        side={projectileSide}
+        showProjectile={showProjectile}
+        endProjectile={endProjectile}
+      />
+      <br />
+
       {/* <p>Message received: {messageReceived}</p> */}
     </div>
   );
