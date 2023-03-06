@@ -3,6 +3,7 @@ import io from "socket.io-client";
 import { useEffect, useState } from "react";
 import Projectile from "./components/Projectile";
 import Input from "./components/Input";
+import Result from "./components/Result";
 import { Button, Grid, Typography } from "@mui/material";
 
 const socket = io.connect("http://localhost:8080");
@@ -54,7 +55,7 @@ function App() {
     setIsTurn(!isTurn);
     if (dist) {
       // check win
-      if (Math.abs(dist) <= 3) {
+      if (Math.abs(dist) <= 300) {
         endGame(projSide == side);
       } else if (dist == 500) {
         // hit itself
@@ -114,7 +115,7 @@ function App() {
 
   return (
     <div className="App">
-      {isWinner !== null && (isWinner ? "You win!" : "You lose!")}
+      {isWinner !== null && <Result isWinner={isWinner}></Result>}
       <Typography variant="h5" gutterBottom align="center">
         Artillery Game
       </Typography>
