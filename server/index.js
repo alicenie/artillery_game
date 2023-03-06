@@ -51,19 +51,11 @@ io.on("connection", (socket) => {
       socket.join(`room-${roomCounter}`);
     }
   }
-  console.log("rooms", rooms);
+  // console.log("rooms", rooms);
 
   socket.emit("joined_room", `room-${roomCounter}`);
 
-  socket.on("send_message", (data) => {
-    console.log(data.room);
-    socket.to(data.room).emit("receive_message", data.message);
-  });
-
   socket.on("fire", (data) => {
-    // if win, tell both player
-
-    // else tell opposite to update
     socket.to(data.room).emit("show_projectile", {
       speed: data.speed,
       angle: data.angle,

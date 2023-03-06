@@ -4,7 +4,27 @@ import { useEffect, useState } from "react";
 import Projectile from "./components/Projectile";
 import Input from "./components/Input";
 import Result from "./components/Result";
-import { Button, Grid, Typography } from "@mui/material";
+import { Grid, Typography, Box } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import EastIcon from "@mui/icons-material/East";
+import WestIcon from "@mui/icons-material/West";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+
+const theme = createTheme({
+  status: {
+    danger: "#e53e3e",
+  },
+  palette: {
+    primary: {
+      main: "#0075a2",
+      contrastText: "fff",
+    },
+    error: {
+      main: "#cd5334",
+      contrastText: "#fff",
+    },
+  },
+});
 
 const socket = io.connect("http://localhost:8080");
 
@@ -21,12 +41,6 @@ function App() {
   const [wind, setWind] = useState("");
   const [dist, setDist] = useState("");
   const [isWinner, setIsWinner] = useState(null);
-  const [messageReceived, setMessageReceived] = useState("");
-
-  const handleSendMessage = () => {
-    socket.emit("send_message", { speed, room });
-    setIsTurn(!isTurn);
-  };
 
   const handleSpeedChange = (speed) => {
     setSpeed(speed);
@@ -71,20 +85,7 @@ function App() {
     socket.emit("end_game", room);
   };
 
-  // only called once, on mount
-  // useEffect(() => {
-  //   socket.on("connect", () => {
-  //     console.log("client connect to socket");
-  //     // socket.emit("join_room");
-  //   });
-  // }, []);
-
   useEffect(() => {
-    socket.on("receive_message", (data) => {
-      setMessageReceived(data);
-      setIsTurn(!isTurn);
-    });
-
     socket.on("joined_room", (room) => {
       console.log("joined room", room);
       setRoom(room);
@@ -113,53 +114,74 @@ function App() {
     });
   }, [socket]);
 
-  return (
-    <div className="App">
-      {isWinner !== null && <Result isWinner={isWinner}></Result>}
-      <Typography variant="h5" gutterBottom align="center">
-        Artillery Game
-      </Typography>
-      <Grid container spacing={8} justifyContent="center">
-        <Grid item>
-          <Typography variant="h6">Wind: {wind} m/s</Typography>
-        </Grid>
-        <Grid item>
-          <Typography variant="h6">
-            {side == ""
-              ? "Wait for your opponent to join..."
-              : isTurn
-              ? "It's your turn!"
-              : "It's your opponent's turn!"}
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Typography variant="h6">
-            Distance to opposing cannon: {dist ? dist + "m" : ""}
-          </Typography>
-        </Grid>
-      </Grid>
-      <Input
-        onSpeedChange={handleSpeedChange}
-        onAngleChange={handleAngleChange}
-        speed={speed}
-        angle={angle}
-      />
-      <Button onClick={handleFire} disabled={!isTurn}>
-        Fire
-      </Button>
-      <Projectile
-        speed={projectileSpeed}
-        leftAngle={cannonAngles.left}
-        rightAngle={cannonAngles.right}
-        side={projectileSide}
-        wind={wind}
-        showProjectile={showProjectile}
-        endProjectile={endProjectile}
-      />
-      <br />
+  const Item = styled(Box)(({ theme }) => ({
+    backgroundColor: "#0075a2",
+    padding: theme.spacing(2),
+    borderRadius: 20,
+    height: "50%",
+    width: "90%",
+    color: "white",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }));
 
-      {/* <p>Message received: {messageReceived}</p> */}
-    </div>
+  return (
+    <ThemeProvider theme={theme}>
+      <div style={{ height: "100vh", backgroundColor: "#f2f4f3" }}>
+        {isWinner !== null && <Result isWinner={isWinner}></Result>}
+        <Typography variant="h5" gutterBottom align="center" padding={1}>
+          Artillery Game
+        </Typography>
+        <Grid container spacing={2} justifyContent="center">
+          <Grid item xs={3}>
+            <Item>
+              <Typography variant="body1">
+                Wind: {wind ? Math.abs(wind) + "m/s" : ""}
+              </Typography>
+              {wind && (wind > 0 ? <EastIcon /> : <WestIcon />)}
+            </Item>
+          </Grid>
+          <Grid item xs={3}>
+            <Item>
+              <Typography variant="body1">
+                {side == ""
+                  ? "Wait for your opponent to join..."
+                  : isTurn
+                  ? "It's your turn!"
+                  : "It's your opponent's turn!"}
+              </Typography>
+            </Item>
+          </Grid>
+          <Grid item xs={4}>
+            <Item>
+              <Typography variant="body1">
+                Distance to opposing cannon: {dist ? dist + "m" : ""}
+              </Typography>
+            </Item>
+          </Grid>
+        </Grid>
+
+        <Input
+          onSpeedChange={handleSpeedChange}
+          onAngleChange={handleAngleChange}
+          onFire={handleFire}
+          speed={speed}
+          angle={angle}
+          isTurn={isTurn}
+        />
+
+        <Projectile
+          speed={projectileSpeed}
+          leftAngle={cannonAngles.left}
+          rightAngle={cannonAngles.right}
+          side={projectileSide}
+          wind={wind}
+          showProjectile={showProjectile}
+          endProjectile={endProjectile}
+        />
+      </div>
+    </ThemeProvider>
   );
 }
 

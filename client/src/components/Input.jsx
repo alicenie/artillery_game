@@ -5,7 +5,9 @@ import {
   Slider,
   Typography,
   Grid,
+  Button,
 } from "@mui/material";
+import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
 
 const Input = (props) => {
   const marks = [
@@ -14,7 +16,13 @@ const Input = (props) => {
   ];
 
   return (
-    <Grid container spacing={8} justifyContent="center">
+    <Grid
+      container
+      columnSpacing={8}
+      justifyContent={"center"}
+      alignItems={"center"}
+      padding={2}
+    >
       <Grid item xs={4}>
         <Typography align="left">Speed</Typography>
         <TextField
@@ -26,7 +34,9 @@ const Input = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">m/s</InputAdornment>,
           }}
+          type="number"
           onChange={(e) => props.onSpeedChange(e.target.value)}
+          color={"primary"}
         />
       </Grid>
       <Grid item xs={4}>
@@ -40,7 +50,20 @@ const Input = (props) => {
           valueLabelDisplay="auto"
           marks={marks}
           onChange={(e) => props.onAngleChange(e.target.value)}
+          color={"primary"}
         />
+      </Grid>
+      <Grid item xs={2}>
+        <Button
+          variant="contained"
+          size="large"
+          color="error"
+          startIcon={<LocalFireDepartmentIcon />}
+          onClick={props.onFire}
+          disabled={!props.isTurn}
+        >
+          Fire
+        </Button>
       </Grid>
     </Grid>
   );
