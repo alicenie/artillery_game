@@ -29,8 +29,8 @@ The client side is implemented using React. The client includes the following fe
 
 - Input: Players can adjust the speed and angle on the interface and fire the projectile by clicking the Fire button. The Fire button is disabled when it is not the player's turn or when there is only one player in the game.
 - Feedback: The projectile movement is implemented using canvas animation. Both players can see each other's movements. The angle of the cannon aligns with the angle specified by the slider. The distance to the opposing cannon is displayed once the projectile hits the ground. The player can also see if this is their turn on the interface.
-- Projectile movement: The projectile movement is calculated in the Projectile component. Both the projectile (weight, diameter) and the environment (air density, wind, gravity) are considered.
+- Projectile movement: The projectile movement is calculated in the Projectile component. Both the projectile factors (weight, diameter, speed, angle) and the environment factors (air density, wind, gravity) are considered.
 
 ## Server
 
-The server side is implemented using Node.js and Socket.io.
+The server side is implemented using Node.js and Socket.io. The server allocates every two players into one instance of game, synchronize game status with players within the same game, and kick players out of the game when it ends.
