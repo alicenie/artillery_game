@@ -10,15 +10,14 @@ const right_cannon = 1500 * ratio;
 // environment and projectile constants
 const gravity = 10; // gravity in m/s^2
 const rho_air = 1; // density of air in kg/m^3
-const mu_air = 1.8e-5; // dynamic viscosity of air in Pa*s
+// const mu_air = 1.8e-5; // dynamic viscosity of air in Pa*s
 const d = 0.1; // diameter of projectile in meters
 const m = 1; // weight of projectile in kg
-// Calculate cross-sectional area of projectile
-const A = Math.PI * Math.pow(d / 2, 2);
+const A = Math.PI * Math.pow(d / 2, 2); // Calculate cross-sectional area of projectile
 
 // calculate air resistance
 const airResistance = (v) => {
-  const Re = (rho_air * v * d) / mu_air;
+  //   const Re = (rho_air * v * d) / mu_air;
   const Cd = 0.47; // coefficient of drag for a sphere
   const F_drag = 0.5 * rho_air * Math.pow(v, 2) * A * Cd;
   return F_drag;
@@ -64,7 +63,6 @@ const Projectile = ({
     const vy0 = v0 * Math.sin(radians); // initial projectile speed on y
     const dt = 0.1; // time step in seconds
     let frameId;
-    let time = 0;
     let vx = vx0;
     let vy = vy0;
     let x = side === "left" ? left_cannon : right_cannon; // initial x position in meters
@@ -102,10 +100,15 @@ const Projectile = ({
       ctx.fill();
 
       // update time and check if animation is finished
-      time += 0.1;
+      //   time += 0.1;
       if (y < 0 || y > canvas_height || x > canvas_width || x < 0) {
         cancelAnimationFrame(frameId);
-        animationFinished();
+        // calculate distance to the opposing player's cannon
+        let dist = null;
+        if (y > canvas_height) {
+          dist = side === "left" ? right_cannon - x : x - left_cannon;
+        }
+        animationFinished(dist);
       } else {
         frameId = requestAnimationFrame(draw);
       }
@@ -119,9 +122,9 @@ const Projectile = ({
     };
   };
 
-  const animationFinished = () => {
+  const animationFinished = (dist) => {
     console.log("Animation finished");
-    endProjectile();
+    endProjectile(dist);
   };
 
   const drawCannon = ({ leftAngle, rightAngle }) => {

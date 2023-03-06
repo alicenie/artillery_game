@@ -18,6 +18,7 @@ function App() {
   const [projectileSpeed, setProjectileSpeed] = useState(100);
   const [showProjectile, setShowProjectile] = useState(false);
   const [wind, setWind] = useState("");
+  const [dist, setDist] = useState("");
   const [messageReceived, setMessageReceived] = useState("");
 
   const handleSendMessage = () => {
@@ -49,9 +50,17 @@ function App() {
     socket.emit("fire", { speed, angle, room, side });
   };
 
-  const endProjectile = () => {
+  const endProjectile = (dist) => {
     setShowProjectile(false);
     setIsTurn(!isTurn);
+    if (dist) {
+      // check win
+      if (Math.abs(dist) <= 3) {
+        console.log("end game");
+      }
+      console.log("distance", dist);
+      setDist(Math.floor(Math.abs(dist)));
+    }
   };
 
   // only called once, on mount
@@ -111,7 +120,12 @@ function App() {
               ? "Wait for your opponent to join..."
               : isTurn
               ? "It's your turn!"
-              : "It's your opposite's turn!"}
+              : "It's your opponent's turn!"}
+          </Typography>
+        </Grid>
+        <Grid item>
+          <Typography variant="h6">
+            Distance to opposing cannon: {dist ? dist + "m" : ""}
           </Typography>
         </Grid>
       </Grid>
