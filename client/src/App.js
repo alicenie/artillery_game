@@ -17,7 +17,7 @@ function App() {
   const [projectileSide, setProjectileSide] = useState("");
   const [projectileSpeed, setProjectileSpeed] = useState(100);
   const [showProjectile, setShowProjectile] = useState(false);
-  const [wind, setWind] = useState(0);
+  const [wind, setWind] = useState("");
   const [messageReceived, setMessageReceived] = useState("");
 
   const handleSendMessage = () => {
@@ -47,11 +47,9 @@ function App() {
 
     // send to server
     socket.emit("fire", { speed, angle, room, side });
-    // setIsTurn(!isTurn);
   };
 
   const endProjectile = () => {
-    console.log("endProjectile", isTurn);
     setShowProjectile(false);
     setIsTurn(!isTurn);
   };
@@ -79,14 +77,14 @@ function App() {
       setIsTurn(data.isTurn);
       setSide(data.side);
       setProjectileSide(data.side);
-      console.log("start game: ", data.isTurn, data.side);
+      setWind(data.wind);
+      console.log("start game: ", data);
     });
 
     socket.on("show_projectile", (data) => {
       setProjectileSpeed(data.speed);
       setProjectileSide(data.side);
       setShowProjectile(true);
-      // setIsTurn(!isTurn);
     });
 
     socket.on("update_cannon", (data) => {

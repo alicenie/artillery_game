@@ -34,11 +34,17 @@ io.on("connection", (socket) => {
     if (numPlayers < playersPerRoom) {
       // Add the player to the last room
       socket.join(`room-${roomCounter}`);
+      // generate a random wind
+      const min = 5;
+      const max = 30;
+      const windMagnitude = Math.floor(Math.random() * (max - min + 1)) + min;
+      const windDirection = Math.random() < 0.5 ? -1 : 1; // positive if to right, negative if to left
+      const wind = windDirection * windMagnitude;
       // start the game
-      socket.emit("start_game", { isTurn: false, side: "right" });
+      socket.emit("start_game", { isTurn: false, side: "right", wind: wind });
       socket
         .to(`room-${roomCounter}`)
-        .emit("start_game", { isTurn: true, side: "left" });
+        .emit("start_game", { isTurn: true, side: "left", wind: wind });
     } else {
       // Create a new room and add the player to that room
       roomCounter += 1;
@@ -52,6 +58,25 @@ io.on("connection", (socket) => {
   socket.on("send_message", (data) => {
     console.log(data.room);
     socket.to(data.room).emit("receive_message", data.message);
+  });
+
+  socket.on("fire", (data) => {
+    // if win, tell both player
+
+    // else tell opposite to update
+    socket.to(data.room).emit("show_projectile", {
+      speed: data.speed,
+      angle: data.angle,
+      side: data.side,
+    });
+  });
+
+  socket.on("rotate_cannon", (data) => {
+    console.log("rotate cannon", data);
+    socket.to(data.room).emit("update_cannon", {
+      angle: data.angle,
+      side: data.side,
+    });
   });
 });
 
