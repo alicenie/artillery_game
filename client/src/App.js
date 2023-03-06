@@ -11,9 +11,6 @@ import WestIcon from "@mui/icons-material/West";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const theme = createTheme({
-  status: {
-    danger: "#e53e3e",
-  },
   palette: {
     primary: {
       main: "#0075a2",
@@ -26,19 +23,21 @@ const theme = createTheme({
   },
 });
 
+// connect to server
 const socket = io.connect("http://localhost:8080");
 
 function App() {
   const [speed, setSpeed] = useState(100);
   const [angle, setAngle] = useState(45);
+  const [room, setRoom] = useState(""); // the room id the player is in
+  const [isTurn, setIsTurn] = useState(false); // if this is the player's turn to fire
+  const [side, setSide] = useState(""); // the left or right side the player's cannon is in
+  const [wind, setWind] = useState("");
+
   const [cannonAngles, setCannonAngles] = useState({ left: 45, right: 45 });
-  const [room, setRoom] = useState("");
-  const [isTurn, setIsTurn] = useState(false);
-  const [side, setSide] = useState("");
-  const [projectileSide, setProjectileSide] = useState("");
+  const [projectileSide, setProjectileSide] = useState(""); // the side the projectile path is shown
   const [projectileSpeed, setProjectileSpeed] = useState(100);
   const [showProjectile, setShowProjectile] = useState(false);
-  const [wind, setWind] = useState("");
   const [dist, setDist] = useState("");
   const [isWinner, setIsWinner] = useState(null);
 
@@ -48,6 +47,7 @@ function App() {
 
   const handleAngleChange = (angle) => {
     setAngle(angle);
+    // send to server to update the other player's cannon
     let tempCannonAngles = cannonAngles;
     tempCannonAngles[side] = angle;
     setCannonAngles(tempCannonAngles);
@@ -60,7 +60,7 @@ function App() {
     setProjectileSpeed(speed);
     setShowProjectile(true);
 
-    // send to server
+    // send to server to update to the other player
     socket.emit("fire", { speed, angle, room, side });
   };
 
@@ -72,8 +72,8 @@ function App() {
       if (Math.abs(dist) <= 3) {
         endGame(projSide == side);
       } else if (dist == 500) {
-        // hit itself
-        endGame(false);
+        // hit their own cannon, lose the game
+        endGame(!projSide == side);
       }
       // display distance to the opposing cannon
       setDist(Math.abs(dist).toFixed(1));
@@ -106,10 +106,8 @@ function App() {
     });
 
     socket.on("update_cannon", (data) => {
-      console.log("updata cannon", data);
       let tempCannonAngles = cannonAngles;
       tempCannonAngles[data.side] = data.angle;
-      console.log(tempCannonAngles);
       setCannonAngles(tempCannonAngles);
     });
   }, [socket]);

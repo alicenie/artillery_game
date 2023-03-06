@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
-// the ratio of real distance (meters) and screen length (px)
-const ratio = 0.5;
+// canvas constants
+const ratio = 0.5; // the ratio of real distance (meters) and screen length (px)
 const canvas_width = 2000 * ratio;
 const canvas_height = 1000 * ratio;
 const buffer = 10;
@@ -31,8 +31,8 @@ const Projectile = ({
   showProjectile,
   endProjectile,
 }) => {
-  const bgCanvasRef = useRef(null);
-  const anCanvasRef = useRef(null);
+  const bgCanvasRef = useRef(null); // background canvas with cannon
+  const anCanvasRef = useRef(null); // animation canvas with projectile
 
   useEffect(() => {
     drawCannon({ leftAngle, rightAngle });
@@ -46,8 +46,6 @@ const Projectile = ({
   useEffect(() => {
     if (showProjectile) {
       fire();
-      console.log(side);
-      //   endProjectile();
     }
   }, [showProjectile]);
 
@@ -91,7 +89,7 @@ const Projectile = ({
       ctx.fillStyle = "#cd5334";
       ctx.fill();
 
-      // update time and check if animation is finished
+      // check if animation is finished
       if (y < 0 || y > canvas_height || x > canvas_width || x < 0) {
         cancelAnimationFrame(frameId);
         // calculate distance to the opposing player's cannon
@@ -114,7 +112,6 @@ const Projectile = ({
   };
 
   const animationFinished = (dist, side) => {
-    console.log("Animation finished");
     endProjectile(dist, side);
   };
 

@@ -51,7 +51,6 @@ io.on("connection", (socket) => {
       socket.join(`room-${roomCounter}`);
     }
   }
-  // console.log("rooms", rooms);
 
   socket.emit("joined_room", `room-${roomCounter}`);
 
@@ -64,7 +63,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("rotate_cannon", (data) => {
-    console.log("rotate cannon", data);
     socket.to(data.room).emit("update_cannon", {
       angle: data.angle,
       side: data.side,
